@@ -10,11 +10,12 @@ class CurlCommand
     private RequestInterface $request;
     private string $script_path;
 
+    private array $options;
+
     public function __construct(string $path)
     {
         $this->script_path = $path;
     }
-
 
     /**
      * @throws ClientException
@@ -22,13 +23,14 @@ class CurlCommand
     public function createCommand(RequestInterface $request, array $options): string
     {
         $this->request = $request;
+        $this->options = $options;
 
-        return implode(' ' , [
+        return implode(' ', [
             $this->getScriptPath(),
             $this->header(),
             $this->data(),
-            $this->additionalData($options),
-            $this->request->getUri()
+            $this->additionalData(),
+            $this->request->getUri(),
         ]);
     }
 
@@ -47,11 +49,11 @@ class CurlCommand
     private function header(): string
     {
         $headersLine = array_map(function ($headerName) {
-            if ($headerName == 'cookies') {
+            if ($headerName === 'cookies') {
                 return null;
             }
 
-            return  "-H '$headerName: {$this->request->getHeaderLine($headerName)}'";
+            return "-H '{$headerName}: {$this->request->getHeaderLine($headerName)}'";
         }, array_keys($this->request->getHeaders()));
 
         return implode(' ', array_filter($headersLine));
@@ -67,11 +69,11 @@ class CurlCommand
             'HEAD' => '-I ',
         };
 
-        if (! empty($this->options['json'])) {
+        if (key_exists('json', $this->options) && is_array($this->options['json'])) {
             $data .= "-d '" . json_encode($this->options['json']) . "' ";
         }
 
-        if (! empty($this->options['data'])) {
+        if (key_exists('data', $this->options) && is_array($this->options['data'])) {
             $data .= "-d '" . http_build_query($this->options['data']) . "' ";
         }
 
@@ -84,24 +86,24 @@ class CurlCommand
         return $data;
     }
 
-    private function additionalData(array $options): string
+    private function additionalData(): string
     {
         $additional = ['--silent -D - -o -'];
 
-        if (! empty($options['proxy'])) {
-            $additional[] = "--proxy '" . $options['proxy']  . "'";
+        if (key_exists('proxy', $this->options)) {
+            $additional[] = "--proxy '{$this->options['proxy']}'";
         }
 
-        if (! empty($options['connect_timeout'])) {
-            $additional[] = "--connect-timeout '" . $options['connect_timeout']  . "'";
+        if (key_exists('connect_timeout', $this->options)) {
+            $additional[] = "--connect-timeout '{$this->options['connect_timeout']}'";
         }
 
-        if (isset($options['allow_redirects']) &&  $options['allow_redirects']) {
-            $additional[] = "-L --max-redirs 5";
+        if (key_exists('allow_redirects', $this->options) && $this->options['allow_redirects']) {
+            $additional[] = '-L --max-redirs 5';
         }
 
-        if (isset($options['verify']) &&  $options['verify'] === false) {
-            $additional[] = "--insecure";
+        if (key_exists('verify', $this->options) && $this->options['verify'] === false) {
+            $additional[] = '--insecure';
         }
 
         return implode(' ', $additional);

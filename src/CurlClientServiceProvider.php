@@ -9,7 +9,8 @@ class CurlClientServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/curl_client.php', 'curl_client'
+            __DIR__ . '/../config/curl_client.php',
+            'curl_client'
         );
     }
 

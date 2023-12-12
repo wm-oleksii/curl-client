@@ -15,7 +15,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
-
 class CurlClient
 {
     private array $options = [];
@@ -71,6 +70,8 @@ class CurlClient
     }
 
     /**
+     * @param array $process
+     * @return array
      * @throws RequestException
      */
     public function sendAsync(array $process): array
@@ -110,18 +111,16 @@ class CurlClient
         return (new Factory())->newPendingProcess()->command($command);
     }
 
+    /**
+     * @throws RequestException
+     */
     public function makeResponse(string $output, ?RequestInterface $request = null): ResponseInterface
     {
         if (mb_stripos($output, 'HTTP/') > 1) {
             $output = mb_strcut($output, mb_stripos($output, 'HTTP/'));
         }
-        if (empty($output)) {
-            $exception = new RequestException('Empty output');
-            if ($request) {
-                $exception->setRequest($request);
-            }
-
-            throw $exception;
+        if ($output === '') {
+            throw new RequestException('Empty output', 0, null, $request);
         }
 
         return Message::parseResponse($output);
@@ -138,6 +137,12 @@ class CurlClient
         return new Request($method, $uri, $headers, $body, $version);
     }
 
+    /**
+     * @param UriInterface $uri
+     * @param array $config
+     *
+     * @return UriInterface
+     */
     protected function buildUri(UriInterface $uri, array $config): UriInterface
     {
         if (isset($config['base_uri'])) {
@@ -152,10 +157,14 @@ class CurlClient
         $this->options = [
             'allow_redirects' => true,
             'verify' => false,
-            'connect_timeout' => 30
+            'connect_timeout' => 30,
         ];
     }
 
+    /**
+     * @param array $options
+     * @return array
+     */
     private function prepareDefaults(array $options): array
     {
         unset($options['headers']['User-Agent']);
