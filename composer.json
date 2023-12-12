@@ -1,0 +1,39 @@
+{
+    "name": "wm-oleksii/curl-client",
+    "description": "HTTP client on top of curl-impersonate",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Oleksii Kravchuk",
+            "email": "wm.oleksii@gmail.com"
+        }
+    ],
+    "bin": [
+        "bin/curl-impersonate-chrome"
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "psr/http-client": "^1.0",
+        "guzzlehttp/psr7": "^2.5.1",
+        "illuminate/support": "^10.0",
+        "illuminate/process": "^10.0",
+        "ext-mbstring": "*",
+      "ext-http": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ok\\CurlClient\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ok\\CurlClient\\CurlClientServiceProvider"
+            ]
+        }
+    }
+}

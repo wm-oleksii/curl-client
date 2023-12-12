@@ -1,0 +1,6 @@
+/vendor
+.phpunit.result.cache
+composer.lock
+# JetBrains IDE
+.idea/
+/_install.sh
