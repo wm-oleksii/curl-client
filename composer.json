@@ -9,7 +9,12 @@
         }
     ],
     "bin": [
-        "bin/curl-impersonate-chrome"
+        "bin/curl-impersonate-chrome",
+        "bin/curl-impersonate-ff",
+        "bin/curl_chrome110",
+        "bin/curl_ff109",
+        "bin/curl_default"
+
     ],
     "minimum-stability": "stable",
     "require": {
