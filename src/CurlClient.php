@@ -116,11 +116,15 @@ class CurlClient
      */
     public function makeResponse(string $output, ?RequestInterface $request = null): ResponseInterface
     {
-        if (mb_stripos($output, 'HTTP/') > 1) {
-            $output = mb_strcut($output, mb_stripos($output, 'HTTP/'));
-        }
         if ($output === '') {
             throw new RequestException('Empty output', 0, null, $request);
+        }
+
+        $output = ltrim($output, "\r\n");
+        $outputParts = preg_split("/\r?\n\r?\n/", $output, 2);
+
+        if (mb_stripos($outputParts[1], 'HTTP/') === 0) {
+            $output = $outputParts[1];
         }
 
         return Message::parseResponse($output);
