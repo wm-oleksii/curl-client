@@ -106,6 +106,10 @@ class CurlCommand
             $additional[] = '--insecure';
         }
 
+        if (mb_stripos($this->request->getHeaderLine('Accept-Encoding'), 'gzip') !== false) {
+            $additional[] = '--compressed';
+        }
+
         return implode(' ', $additional);
     }
 }
