@@ -171,7 +171,7 @@ class CurlClient
      */
     private function prepareDefaults(array $options): array
     {
-        unset($options['headers']['User-Agent']);
+        //unset($options['headers']['User-Agent']);
         $defaults = $options + $this->options;
 
         foreach ($defaults as $k => $v) {
