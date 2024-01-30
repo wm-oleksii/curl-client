@@ -121,10 +121,10 @@ class CurlClient
         }
 
         $output = ltrim($output, "\r\n");
-        $outputParts = preg_split("/\r?\n\r?\n/", $output, 2);
 
-        if (mb_stripos($outputParts[1], 'HTTP/') === 0) {
-            $output = $outputParts[1];
+        $lastPosition = strrpos(substr($output, 0, 100), 'HTTP/');
+        if ($lastPosition > 0) {
+            $output = mb_substr($output, $lastPosition);
         }
 
         return Message::parseResponse($output);
