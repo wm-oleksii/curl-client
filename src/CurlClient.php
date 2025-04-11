@@ -120,12 +120,17 @@ class CurlClient
             throw new RequestException('Empty output', 0, null, $request);
         }
 
-        $output = ltrim($output, "\r\n");
+        $matches = [];
+        preg_match_all('/^HTTP\/[0-9.]+\s+\d{3}/m', $output, $matches, PREG_OFFSET_CAPTURE);
 
-        $lastPosition = strrpos(substr($output, 0, 100), 'HTTP/');
-        if ($lastPosition > 0) {
-            $output = mb_substr($output, $lastPosition);
+        if (empty($matches[0])) {
+            throw new RequestException('Headers not found', 0, null, $request);
         }
+
+        $lastMatch = end($matches[0]);
+        $lastHttpPos = $lastMatch[1];
+
+        $output = substr($output, $lastHttpPos);
 
         return Message::parseResponse($output);
     }
